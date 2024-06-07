@@ -1,0 +1,27 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 0
+
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = '''if self.ability.set == 'Booster' or self.ability.set == 'Spectral' then'''
+position = "before"
+payload = '''
+if self.ability.set == "Spectral" then
+    local base_colours = {}
+    local new_colours = {}
+    for i=1, 26 do
+        base_colours[i] = HEX(G.base_spectral[i])
+        new_colours[i] = HEX(G.selected_spectral_colour[i])
+    end
+    new_colours[27] = HEX(G.selected_spectral_colour[27])
+    G.SHADERS['spectralRecolour']:send("base_colours",unpack(base_colours))
+    G.SHADERS['spectralRecolour']:send("new_colours",unpack(new_colours))
+    self.children.center:draw_shader('spectralRecolour', nil, self.ARGS.send_to_shader)
+    --G.SHADERS['specrec_spectralRecolour']:send("base_colours",unpack(base_colours))
+    --G.SHADERS['specrec_spectralRecolour']:send("new_colours",unpack(new_colours))
+    --self.children.center:draw_shader('specrec_spectralRecolour', nil, self.ARGS.send_to_shader)
+end'''
+match_indent = true

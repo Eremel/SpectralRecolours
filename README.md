@@ -4,6 +4,7 @@ Change the colours you want to change then save the palette as a `.hex` file. Th
 Change `G.selected_spectral_colour = test_colour` to be your new palette.
 
 =============
+
 *Known bugs:*
 - when pixel shading is active, cards have lines in between some pixels
 

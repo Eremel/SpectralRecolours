@@ -6,22 +6,44 @@ priority = 0
 [[patches]]
 [patches.pattern]
 target = "card.lua"
-pattern = '''if self.ability.set == 'Booster' or self.ability.set == 'Spectral' then'''
+pattern = '''if self.ability.name == 'Invisible Joker' and (self.config.center.discovered or self.bypass_discovery_center) then'''
 position = "before"
 payload = '''
-if self.ability.set == "Spectral" then
-    local base_colours = {}
-    local new_colours = {}
-    for i=1, 26 do
-        base_colours[i] = HEX(G.base_spectral[i])
-        new_colours[i] = HEX(G.selected_spectral_colour[i])
-    end
-    new_colours[27] = HEX(G.selected_spectral_colour[27])
-    G.SHADERS['spectralRecolour']:send("base_colours",unpack(base_colours))
-    G.SHADERS['spectralRecolour']:send("new_colours",unpack(new_colours))
+if G.RECOLOR[self.ability.set] and G.SETTINGS.selected_colours[self.ability.set].order > 1 then
+    G.SHADERS['spectralRecolour']:send("base_colours",unpack(G.RECOLOR[self.ability.set].Default.values))
+    G.SHADERS['spectralRecolour']:send("new_colours",unpack(G.SETTINGS.selected_colours[self.ability.set].values))
+    G.SHADERS['spectralRecolour']:send("size",#G.SETTINGS.selected_colours[self.ability.set].values)
     self.children.center:draw_shader('spectralRecolour', nil, self.ARGS.send_to_shader)
-    --G.SHADERS['specrec_spectralRecolour']:send("base_colours",unpack(base_colours))
-    --G.SHADERS['specrec_spectralRecolour']:send("new_colours",unpack(new_colours))
-    --self.children.center:draw_shader('specrec_spectralRecolour', nil, self.ARGS.send_to_shader)
-end'''
+end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = '''local t = create_UIBox_generic_options({back_func = 'options',contents = {create_tabs('''
+position = "before"
+payload = '''
+tabs[#tabs+1] = {
+    label = 'Card Colours',
+    tab_definition_function = G.UIDEF.settings_tab,
+    tab_definition_function_args = 'Colour'
+}
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = '''elseif tab == 'Graphics' then'''
+position = "before"
+payload = '''
+elseif tab == 'Colour' then
+local nodeRet = {}
+for k,v in pairs(G.RECOLOR) do
+    if #v.names > 1 then
+        nodeRet[#nodeRet+1] = create_option_cycle({w = 4,scale = 0.8, label = k.." colours" ,options = v.names, opt_callback = k.."_color", current_option = G.SETTINGS.selected_colours[k].order})
+    end
+end
+return {n=G.UIT.ROOT, config={align = "cm", padding = 0.05, colour = G.C.CLEAR}, nodes=nodeRet}'''
 match_indent = true

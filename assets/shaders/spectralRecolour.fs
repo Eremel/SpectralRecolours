@@ -10,7 +10,8 @@ extern MY_HIGHP_OR_MEDIUMP number dissolve;
 extern MY_HIGHP_OR_MEDIUMP number time;
 extern MY_HIGHP_OR_MEDIUMP vec4 texture_details;
 extern MY_HIGHP_OR_MEDIUMP vec4 base_colours[26];
-extern MY_HIGHP_OR_MEDIUMP vec4 new_colours[27];
+extern MY_HIGHP_OR_MEDIUMP vec4 new_colours[26];
+extern MY_HIGHP_OR_MEDIUMP number size;
 extern MY_HIGHP_OR_MEDIUMP vec2 image_details;
 extern bool shadow;
 extern MY_HIGHP_OR_MEDIUMP vec4 burn_colour_1;
@@ -103,14 +104,14 @@ vec4 effect( vec4 colour, Image texture, vec2 texture_coords, vec2 screen_coords
 	vec2 uv = (((texture_coords)*(image_details)) - texture_details.xy*texture_details.ba)/texture_details.ba;
     
     if (spectralRecolour.g > 0.0 || spectralRecolour.g < 0.0) {
-        for (int i=0; i < 26; i++){
+        for (int i=0; i < size; i++){
             if (tex.rgb == base_colours[i].rgb){
                 tex.rgb = new_colours[i].rgb;
                 return dissolve_mask(tex*colour, texture_coords, uv);
             }
         }
-        tex.rgb = new_colours[26].rgb;
     }
+    tex.a = 0;
 	return dissolve_mask(tex*colour, texture_coords, uv);
 }
 

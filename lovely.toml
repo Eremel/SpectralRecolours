@@ -10,12 +10,36 @@ pattern = '''if self.ability.name == 'Invisible Joker' and (self.config.center.d
 position = "before"
 payload = '''
 if G.RECOLOR[self.ability.set] and G.SETTINGS.selected_colours[self.ability.set].order > 1 then
-    G.SHADERS['spectralRecolour']:send("base_colours",unpack(G.RECOLOR[self.ability.set].Default.values))
-    G.SHADERS['spectralRecolour']:send("new_colours",unpack(G.SETTINGS.selected_colours[self.ability.set].values))
-    G.SHADERS['spectralRecolour']:send("size",#G.SETTINGS.selected_colours[self.ability.set].values)
-    self.children.center:draw_shader('spectralRecolour', nil, self.ARGS.send_to_shader)
-end
-'''
+    G.SHADERS['recolour']:send("base_colours",unpack(G.SEND_TO_SHADER.DEFAULT))
+    G.SHADERS['recolour']:send("new_colours",unpack(G.SEND_TO_SHADER.ADJUSTED))
+    G.SHADERS['recolour']:send("size",#G.SEND_TO_SHADER.ADJUSTED)
+    self.children.center:draw_shader('recolour', nil, self.ARGS.send_to_shader)
+end'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = '''if self.children.particles then self.children.particles:draw() end'''
+position = "after"
+payload = '''
+if G.RECOLOR[self.ability.set] and G.SETTINGS.selected_colours[self.ability.set] then
+    G.SEND_TO_SHADER.DEFAULT = G.RECOLOR[self.ability.set].Default.values
+    G.SEND_TO_SHADER.ADJUSTED = G.SETTINGS.selected_colours[self.ability.set].values
+end'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "engine/sprite.lua"
+pattern = '''G.SHADERS[_shader or 'dissolve']:send('mouse_screen_pos', self.ARGS.prep_shader.cursor_pos)'''
+position = "after"
+payload = '''
+if (_shader == "negative" or _shader == "holo" or _shader == "polychrome") then
+    G.SHADERS[_shader]:send("base_colours",unpack(G.SEND_TO_SHADER.DEFAULT))
+    G.SHADERS[_shader]:send("new_colours",unpack(G.SEND_TO_SHADER.ADJUSTED))
+    G.SHADERS[_shader]:send("size",#G.SEND_TO_SHADER.ADJUSTED)
+end'''
 match_indent = true
 
 [[patches]]

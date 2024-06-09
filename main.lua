@@ -40,8 +40,12 @@ G.FUNCS.Tarot_color = function(args)
 end
 
 -- SMODS.Shader({key = 'spectralRecolour', path = SMODS.current_mod.path.."/assets/shaders/spectralRecolour.fs"})
-G.SHADERS['spectralRecolour'] = love.graphics.newShader(SMODS.current_mod.path.."/assets/shaders/spectralRecolour.fs")
+G.SHADERS['recolour'] = love.graphics.newShader(SMODS.current_mod.path.."/assets/shaders/recolour.fs")
+G.SHADERS['negative'] = love.graphics.newShader(SMODS.current_mod.path.."/assets/shaders/negative.fs")
+G.SHADERS['holo'] = love.graphics.newShader(SMODS.current_mod.path.."/assets/shaders/holo.fs")
+G.SHADERS['polychrome'] = love.graphics.newShader(SMODS.current_mod.path.."/assets/shaders/polychrome.fs")
 
+G.SEND_TO_SHADER = {}
 G.RECOLOR = {}
 G.RECOLOR.Tarot = {
     names = {},
@@ -121,6 +125,15 @@ new_spectral("Trans", {
     "fdfdfd",    "ffffff"
     })
 
+new_spectral("Lesbian", {
+    "344245",    "6d4165",    "4f6367",    "c05b34",
+    "bc633d",    "c67e52",    "e1824b",    "ee9558",    "f2af81",
+    "864d77",    "607192",    "637699",    "993b77",    "a05285",
+    "ba5a94",    "cd67a4",    "d16ea9",    "bb7fb4",    "d2bfd5",
+    "e3bfde",    "e299c4",    "c0c0c0",    "dcdcdc",    "e2ebf9",
+    "fdfdfd",    "ffffff"
+    })
+
 new_planet("Default", {"4f6367","a58547","74849f","5b9baa","84c5d2","dff5fc","ffffff"})
 new_planet("Purple", {"6f1688","9147a5","b64cd3","8b5baa","ba84d2","f8dffc","ffffff"})
 
@@ -128,7 +141,7 @@ new_tarot("Default", {"4f6367","a58547","dab772","ffe5b4","ffffff"})
 new_tarot("Burnt Orange", {"611708","a34f3d","e98854","fbc4a7","ffffff"})
 new_tarot("Persona 5", {"4f0a0a","2d1515","c11646","726663","b0b0b0"})
 
-G.SETTINGS.selected_colours = {
+G.SETTINGS.selected_colours = G.SETTINGS.selected_colours or {
     Tarot = G.RECOLOR.Tarot["Default"],
     Planet = G.RECOLOR.Planet["Default"],
     Spectral = G.RECOLOR.Spectral["Default"]
